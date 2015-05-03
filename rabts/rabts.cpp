@@ -3,7 +3,6 @@
 // Для переходя к многобайтовым символам надо внести изменения в функции:
 //		int code_of(char ch)
 //		void string_sort(std::vector<std::string> &unsorted, std::vector<std::string> &sorted, int level)
-//		(действия для последней корзины но без использования алфавита)
 
 #include <algorithm>
 #include <cstdio>
@@ -58,7 +57,7 @@ int index_of(char ch)
 	//A pointer to the first occurrence of character in str.
 	//If the character is not found, the function returns a null pointer.
 	char * pos = strchr (alphabet, ch);
-	if(pos == NULL) return strlen(alphabet);
+	if(pos == NULL) return -1;
 	return (int)(pos-alphabet);
 }
 
@@ -71,7 +70,6 @@ int code_of(char ch)
 
 char * input_file_name = NULL;
 char * output_file_name = NULL;
-
 
 // trim from start
 static inline std::string &ltrim(std::string &s) {
@@ -111,11 +109,11 @@ void append_to(std::vector<std::string> &sorted, std::string s)
 // Рекурсивная сортировка строк, основанная на алгоритме корзинной сортировки
 void string_sort(std::vector<std::string> &unsorted, std::vector<std::string> &sorted, int level)
 {
-	std::vector<std::vector<std::string>> buckets(strlen(alphabet)+1);
+	int n = strlen(alphabet);
+	std::vector<std::vector<std::string>> buckets(n+256);
 
 	// Разбрасываем несортированную коллекцию строк по корзинам
 	// Номер корзины уже сразу даёт предварительную сортировку
-	// Все с символами вне алфавита попадают в последнюю корзину
 	for(int i=unsorted.size(); i--; )
 	{
 		std::string s = unsorted.back();
@@ -128,11 +126,12 @@ void string_sort(std::vector<std::string> &unsorted, std::vector<std::string> &s
 		}
 
 		int index = index_of(ch);
+		if(index==-1) index=n+code_of(ch);
 		buckets[index].push_back(s);
 	}
 
 	// Применяем рекурсивно ко всем корзинам кроме последней
-	for(int i=0; i<strlen(alphabet); i++)
+	for(int i=0; i<n+256; i++)
 		switch (buckets[i].size())
 		{
 			case 0:
@@ -148,59 +147,6 @@ void string_sort(std::vector<std::string> &unsorted, std::vector<std::string> &s
 				string_sort(buckets[i], sorted, level+1);
 				break;
 		}
-
-	// Для последней корзины применяем те же действия но без использования алфавита
-	std::vector<std::string> last_backet = buckets.back();
-
-	switch (last_backet.size())
-	{
-		case 0:
-			break;
-		case 1:
-			{
-				std::string s = last_backet.back();
-				last_backet.pop_back();
-				append_to(sorted,s);
-			}
-			break;
-		default:
-			{
-				std::vector<std::vector<std::string>> buckets256(256);
-
-				for(int i=last_backet.size(); i--; )
-				{
-					std::string s = last_backet.back();
-					last_backet.pop_back();
-
-					char ch = s[level];
-					if(ch == NULL) {
-						sorted.push_back(s);
-						continue;
-					}
-
-					int index = code_of(ch);
-					buckets256[index].push_back(s);
-				}
-
-				for(int i=0; i<256; i++)
-				switch (buckets256[i].size())
-				{
-					case 0:
-						break;
-					case 1:
-						{
-							std::string s = buckets256[i].back();
-							buckets256[i].pop_back();
-							append_to(sorted,s);
-						}
-						break;
-					default:
-						string_sort(buckets256[i], sorted, level+1);
-						break;
-				}
-			}
-			break;
-	}
 }
 
 int main(int argc, char* argv[])
