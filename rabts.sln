@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rabts", "rabts\rabts.vcxproj", "{ECC2E1F7-E160-4EEA-BA6B-148708D32D9D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{260B5B96-4D49-47A3-86AD-10E274A6504B}"
+	ProjectSection(SolutionItems) = preProject
+		Отчёт.docx = Отчёт.docx
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
